@@ -23,8 +23,8 @@ const ManageCars = () => {
           <thead className="text-gray-500">
             <tr>
               <th className="p-3 font-medium ">Car</th>
-              <th className="p-3 font-medium max-md:hidden">Category</th>
-              <th className="p-3 font-medium ">Price</th>
+              <th className="p-3 font-medium max-md:hidden">Date Range</th>
+              <th className="p-3 font-medium ">Total</th>
               <th className="p-3 font-medium max-md:hidden">Status</th>
               <th className="p-3 font-medium ">Actions</th>
             </tr>
