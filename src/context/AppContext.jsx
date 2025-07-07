@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { data, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
-axios.defaults.baseURL = import.meta.env.VITR_BASE_URL;
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 export const AppContext = React.createContext();
 
@@ -24,7 +24,7 @@ export const AppProvider = ({ children }) => {
   // func to check the user is loggedin?
   const fetchUser = async ()=>{
     try {
-      const data = await axios.get('/api/user/data')
+      const {data} = await axios.get('/api/user/data')
       if(data.success){
         setUser(data.user);
         setIsOwner(data.user.role === 'owner');
