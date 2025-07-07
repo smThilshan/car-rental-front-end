@@ -13,6 +13,7 @@ import ManageCars from './pages/owner/ManageCars';
 import ManageBooking from './pages/owner/ManageBooking';
 import Layout from './pages/owner/Layout';
 import Login from './components/Login';
+import {Toaster} from 'react-hot-toast';
 
 const App = () => {
 
@@ -21,6 +22,7 @@ const App = () => {
  
   return (
     <>
+    <Toaster/>
     {showLogin &&   <Login setShowLogin = {setShowLogin} /> }
   
      {!isOwnerPath && <Navbar setShowLogin={setShowLogin} />}
