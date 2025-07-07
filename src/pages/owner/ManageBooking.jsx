@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from "react";
 import TitleOwner from "../../components/owner/TitleOwner";
 import { dummyCarData, dummyMyBookingsData } from "../../assets/assets";
+import toast from 'react-hot-toast';
+import { useAppContext } from "../../context/AppContext";
+
 
 const ManageBooking = () => {
-  const currency = import.meta.env.VITE_CURRENCY;
+
+  const { axios, isOwner, navigate, currency } = useAppContext();
+
 
   const [bookings, setBookings] = useState([]);
 
   const fetchOwnerBookings = async () => {
-    setBookings(dummyMyBookingsData);
+    // setBookings(dummyMyBookingsData);
+     try {
+      const { data } = await axios.get("/api/owner/cars");
+      if (data.success) {
+        
+
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
