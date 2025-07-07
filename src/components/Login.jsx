@@ -13,9 +13,9 @@ const Login = () => {
   const onSubmitHandler = async (event) =>{
     try {
        event.preventDefault();
-    const url = `/api/user/${state}`;
-    console.log("➡️ Hitting URL:", url);
-    console.log("➡️ Payload:", { name, email, password });
+    // const url = `/api/user/${state}`;
+    // console.log("➡️ Hitting URL:", url);
+    // console.log("➡️ Payload:", { name, email, password });
 
       // event.preventDefault();
       const {data} = await axios.post(`/api/user/${state}`,{name, email, password})
