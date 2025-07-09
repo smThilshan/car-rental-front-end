@@ -2,20 +2,41 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { assets, dummyCarData } from "../assets/assets";
 import Loader from "../components/Loader";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const CarDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+ 
+  const {cars, axios,navigate, pickupDate, returnDate, setPickupDate, setReturnDate} = useAppContext();
   const [car, setCar] = useState(null);
   const currency = import.meta.env.VITE_CURRENCY;
 
   const handleSubmit = async (e)=>{
     e.preventDefault();
+    try {
+      const {data} = await axios.post('/api/bookings/create-booking',{
+        car: id,
+        pickupDate,
+        returnDate
+      })
+
+      if(data.success){
+        toast.success(data.message);
+        navigate('/my-bookings')
+      }
+      else {
+         toast.error(data.message);
+      }
+      
+    } catch (error) {
+       toast.error(error.message);
+    }
   }
 
   useEffect(() => {
-    setCar(dummyCarData.find((car) => car._id === id));
-  }, [id]);
+    setCar(cars.find((car) => car._id === id));
+  }, [cars,id]);
 
   return car ? (
     <div className="px-6 md:px-16 lg:px-24 xl:px-32 mt-16">
@@ -109,6 +130,8 @@ const CarDetails = () => {
               type="date"
               className="border border-borderColor px-3 py-2 rounded-lg"
               required
+              value={pickupDate}
+              onChange={(e)=>{setPickupDate(e.target.value)}}
               id="pickup-date"
               min={new Date().toISOString().split("T")[0]}
             />
@@ -120,6 +143,8 @@ const CarDetails = () => {
               type="date"
               className="border border-borderColor px-3 py-2 rounded-lg"
               required
+               value={returnDate}
+              onChange={(e)=>{setReturnDate(e.target.value)}}
               id="return-date"
              
             />
