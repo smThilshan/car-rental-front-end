@@ -1,24 +1,38 @@
 import React, { useEffect, useState } from "react";
 import TitleOwner from "../../components/owner/TitleOwner";
 import { dummyCarData, dummyMyBookingsData } from "../../assets/assets";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext";
 
-
 const ManageBooking = () => {
-
   const { axios, isOwner, navigate, currency } = useAppContext();
-
 
   const [bookings, setBookings] = useState([]);
 
   const fetchOwnerBookings = async () => {
     // setBookings(dummyMyBookingsData);
-     try {
-      const { data } = await axios.get("/api/owner/cars");
+    try {
+      const { data } = await axios.get("/api/bookings/owner");
       if (data.success) {
-        
+        setBookings(data.bookings);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
+  const changeBookingStatus = async (bookingId, status) => {
+    // setBookings(dummyMyBookingsData);
+    try {
+      const { data } = await axios.post("/api/bookings/change-status", {
+        bookingId,
+        status,
+      });
+      if (data.success) {
+        toast.success(data.message);
+        fetchOwnerBookings();
       } else {
         toast.error(data.message);
       }
@@ -30,6 +44,16 @@ const ManageBooking = () => {
   useEffect(() => {
     fetchOwnerBookings();
   }, []);
+
+  // Handler to change booking status to "pending"
+  const handleSetPending = (bookingId) => {
+    changeBookingStatus(bookingId, "pending");
+  };
+
+  // Handler to change booking status to "confirmed"
+  const handleSetConfirmed = (bookingId) => {
+    changeBookingStatus(bookingId, "confirmed");
+  };
 
   return (
     <div className="px-4 pt-10 md:px-10 w-full">
@@ -88,21 +112,32 @@ const ManageBooking = () => {
                     {booking.status === "confirmed" ? "Confirmed" : "Pending"}
                   </span>
                 </td>
-                <td className="p-3">
-  {booking.cancelled ? (
-    <span className="block text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-500">
-      Cancelled
-    </span>
-  ) : (
-    <button
-      onClick={() => handleCancel(index)}
-      className="px-3 py-1 rounded-md bg-red-500 text-white text-xs hover:bg-red-600"
-    >
-      Cancel
-    </button>
-  )}
-</td>
-
+                <td className="p-3 flex gap-2">
+                  {booking.cancelled ? (
+                    <span className="block text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-500">
+                      Cancelled
+                    </span>
+                  ) : (
+                    <>
+                      {booking.status !== "pending" && (
+                        <button
+                          onClick={() => handleSetPending(booking._id)}
+                          className="px-3 py-1 rounded-md bg-yellow-500 text-white text-xs hover:bg-yellow-600"
+                        >
+                          Set Pending
+                        </button>
+                      )}
+                      {booking.status !== "confirmed" && (
+                        <button
+                          onClick={() => handleSetConfirmed(booking._id)}
+                          className="px-3 py-1 rounded-md bg-green-500 text-white text-xs hover:bg-green-600"
+                        >
+                          Confirm
+                        </button>
+                      )}
+                    </>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

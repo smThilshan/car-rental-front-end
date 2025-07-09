@@ -44,7 +44,7 @@ export const AppProvider = ({ children }) => {
       const {data} = await axios.get('/api/user/cars');
       data.success ? setCars(data.cars) : toast.error(data.message);
     } catch (error) {
-      toast.error(data.message);
+      toast.error(error.message);
     }
   }
 
@@ -70,8 +70,14 @@ export const AppProvider = ({ children }) => {
     if(token){
       axios.defaults.headers.common['Authorization'] = `${token}`
       fetchUser();
+       fetchCars(); //
     }
   },[token]);
+
+//   useEffect(() => {
+//   fetchCars();
+// }, []);
+
 
   const value = {
     navigate, currency, axios, user, setUser, token, setToken, isOwner, setIsOwner, fetchUser, showLogin, setShowLogin, logout, fetchCars, cars, setCars, pickupDate, returnDate, setPickupDate, setReturnDate
