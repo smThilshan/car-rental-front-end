@@ -1,4 +1,4 @@
-import React,{ createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { data, useNavigate } from "react-router-dom";
@@ -16,71 +16,111 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [pickupDate, setPickupDate] = useState('');
-  const [returnDate, setReturnDate] = useState('');
+  const [pickupDate, setPickupDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
 
   const [cars, setCars] = useState([]);
+  const [bookings, setBookings] = useState([]);
 
   // func to check the user is loggedin?
-  const fetchUser = async ()=>{
+  const fetchUser = async () => {
     try {
-      const {data} = await axios.get('/api/user/data')
-      if(data.success){
+      const { data } = await axios.get("/api/user/data");
+      if (data.success) {
         setUser(data.user);
-        setIsOwner(data.user.role === 'owner');
-      } else{
-        navigate('/');
+        setIsOwner(data.user.role === "owner");
+      } else {
+        navigate("/");
       }
-
     } catch (error) {
       toast.error(error.message);
-      
     }
-  }
+  };
 
   // Fetch all cars
-  const fetchCars = async ()=>{
+  const fetchCars = async () => {
     try {
-      const {data} = await axios.get('/api/user/cars');
+      const { data } = await axios.get("/api/user/cars");
       data.success ? setCars(data.cars) : toast.error(data.message);
     } catch (error) {
       toast.error(error.message);
     }
+  };
+
+  // Fetch all bookings
+  const fetchBookings = async () => {
+  try {
+    const { data } = await axios.get("/api/user/bookings");
+    if (data.success) {
+      setBookings(data.bookings);
+      return data.bookings; // RETURN it!
+    } else {
+      toast.error(data.message);
+      return null;
+    }
+  } catch (error) {
+    toast.error(error.message);
+    return null;
   }
+};
+
 
   // func to Log out User
-  const logout = ()=>{
+  const logout = () => {
     localStorage.removeItem(token);
     setToken(null);
     setUser(null);
     setIsOwner(false);
-     axios.defaults.headers.common['Authorization'] = "";
-     toast.success("You have been logged out");
-  }
-
+    axios.defaults.headers.common["Authorization"] = "";
+    toast.success("You have been logged out");
+  };
 
   // useEffect to retrieve the token from local storage
-  useEffect(()=>{
-    const token = localStorage.getItem('token');
+  useEffect(() => {
+    const token = localStorage.getItem("token");
     setToken(token);
-  },[]);
+  }, []);
 
   // useEffect to fetch the local data when token is available
-  useEffect(()=>{
-    if(token){
-      axios.defaults.headers.common['Authorization'] = `${token}`
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `${token}`;
       fetchUser();
-       fetchCars(); //
+      fetchCars(); //
+      fetchBookings();
+      
     }
-  },[token]);
+  }, [token]);
 
-//   useEffect(() => {
-//   fetchCars();
-// }, []);
+  
 
+  //   useEffect(() => {
+  //   fetchCars();
+  // }, []);
 
   const value = {
-    navigate, currency, axios, user, setUser, token, setToken, isOwner, setIsOwner, fetchUser, showLogin, setShowLogin, logout, fetchCars, cars, setCars, pickupDate, returnDate, setPickupDate, setReturnDate
+    navigate,
+    currency,
+    axios,
+    user,
+    setUser,
+    token,
+    setToken,
+    isOwner,
+    setIsOwner,
+    fetchUser,
+    fetchBookings,
+    showLogin,
+    setShowLogin,
+    logout,
+    fetchCars,
+    cars,
+    setCars,
+    pickupDate,
+    bookings,   
+    returnDate,
+    setPickupDate,
+    setReturnDate,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

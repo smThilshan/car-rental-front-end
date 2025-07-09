@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import TitleOwner from "../../components/owner/TitleOwner";
-import { dummyCarData, dummyMyBookingsData } from "../../assets/assets";
 import toast from "react-hot-toast";
 import { useAppContext } from "../../context/AppContext";
 
@@ -9,8 +8,8 @@ const ManageBooking = () => {
 
   const [bookings, setBookings] = useState([]);
 
+  // Fetch bookings for this owner
   const fetchOwnerBookings = async () => {
-    // setBookings(dummyMyBookingsData);
     try {
       const { data } = await axios.get("/api/bookings/owner");
       if (data.success) {
@@ -23,8 +22,8 @@ const ManageBooking = () => {
     }
   };
 
+  // Change status handler
   const changeBookingStatus = async (bookingId, status) => {
-    // setBookings(dummyMyBookingsData);
     try {
       const { data } = await axios.post("/api/bookings/change-status", {
         bookingId,
@@ -41,19 +40,22 @@ const ManageBooking = () => {
     }
   };
 
-  useEffect(() => {
-    fetchOwnerBookings();
-  }, []);
-
-  // Handler to change booking status to "pending"
+  // Convenience handlers
   const handleSetPending = (bookingId) => {
     changeBookingStatus(bookingId, "pending");
   };
 
-  // Handler to change booking status to "confirmed"
   const handleSetConfirmed = (bookingId) => {
     changeBookingStatus(bookingId, "confirmed");
   };
+
+  const handleSetCancelled = (bookingId) => {
+    changeBookingStatus(bookingId, "cancelled");
+  };
+
+  useEffect(() => {
+    fetchOwnerBookings();
+  }, []);
 
   return (
     <div className="px-4 pt-10 md:px-10 w-full">
@@ -85,9 +87,9 @@ const ManageBooking = () => {
                     alt=""
                     className="h-12 w-12 aspect-square rounded-md object-cover"
                   />
-                  <td>
+                  <div>
                     {booking.car.brand} . {booking.car.model}
-                  </td>
+                  </div>
                 </td>
 
                 <td className="p-3 max-md:hidden">
@@ -102,21 +104,40 @@ const ManageBooking = () => {
                 <td className="p-3 max-md:hidden">
                   <span
                     className={`px-3 py-1 rounded-full text-xs
-      ${
-        booking.status === "confirmed"
-          ? "bg-green-100 text-green-500"
-          : "bg-yellow-100 text-yellow-500"
-      }
-    `}
+                      ${
+                        booking.status === "confirmed"
+                          ? "bg-green-100 text-green-500"
+                          : booking.status === "pending"
+                          ? "bg-yellow-100 text-yellow-500"
+                          : "bg-gray-100 text-gray-500"
+                      }
+                    `}
                   >
-                    {booking.status === "confirmed" ? "Confirmed" : "Pending"}
+                    {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                   </span>
                 </td>
-                <td className="p-3 flex gap-2">
+
+                <td className="p-3 flex gap-2 items-center">
                   {booking.cancelled ? (
                     <span className="block text-xs px-3 py-1 rounded-md bg-gray-100 text-gray-500">
                       Cancelled
                     </span>
+                  ) : booking.status === "pending" ? (
+                    <select
+                      value="pending"
+                      onChange={(e) => {
+                        const selected = e.target.value;
+                        if (selected === "confirmed") handleSetConfirmed(booking._id);
+                        if (selected === "cancelled") handleSetCancelled(booking._id);
+                      }}
+                      className="border border-borderColor px-2 py-1 rounded text-xs bg-white text-gray-700"
+                    >
+                      <option value="pending" disabled>
+                        Pending
+                      </option>
+                      <option value="confirmed">Confirm</option>
+                      <option value="cancelled">Cancel</option>
+                    </select>
                   ) : (
                     <>
                       {booking.status !== "pending" && (

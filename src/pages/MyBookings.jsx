@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { assets, dummyMyBookingsData } from "../assets/assets";
 import Title from "../components/Title";
+import { useAppContext } from "../context/AppContext";
 
 const MyBookings = () => {
-  const [bookings, setBookings] = useState([]);
-    
-  const currency = import.meta.env.VITE_CURRENCY;
 
-  const fetchBookings = async () => {
-    setBookings(dummyMyBookingsData);
+  const { axios, cars, currency, fetchBookings, bookings } = useAppContext();
+
+  const fetchUserBookings = async () => {
+    fetchBookings(); 
   };
 
   useEffect(() => {
-    fetchBookings();
+    fetchUserBookings();
   }, []);
+
+  if (!bookings) {
+    return (
+      <div className="px-6 mt-16 text-center">
+        <p>No Booking Yet!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-48 mt-16 text-sm max-w7xl">
